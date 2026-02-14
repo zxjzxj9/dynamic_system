@@ -2,6 +2,7 @@ import sympy as sp
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
+from scipy.integrate import solve_ivp
 
 
 def find_equilibria(f_expr, g_expr, x, y, search_range=(-10, 10)):
@@ -64,17 +65,35 @@ def plot_phase_portrait(f_expr, g_expr, x, y,
         classifications[eq] = (cls, eigs)
 
     # --- Set up grid ---
+    nullcline_n = 400  # finer grid for smooth nullclines
     xs = np.linspace(xlim[0], xlim[1], grid_n)
     ys = np.linspace(ylim[0], ylim[1], grid_n)
     X, Y = np.meshgrid(xs, ys)
     U = f_func(X, Y)
     V = g_func(X, Y)
 
+    xs_fine = np.linspace(xlim[0], xlim[1], nullcline_n)
+    ys_fine = np.linspace(ylim[0], ylim[1], nullcline_n)
+    Xf, Yf = np.meshgrid(xs_fine, ys_fine)
+    Uf = f_func(Xf, Yf)
+    Vf = g_func(Xf, Yf)
+
     speed = np.sqrt(U**2 + V**2)
     speed = np.where(speed == 0, 1e-10, speed)
 
     # --- Plot ---
     fig, ax = plt.subplots(figsize=(9, 8))
+
+    # Nullclines
+    ax.contour(Xf, Yf, Uf, levels=[0], colors="limegreen",
+               linewidths=2, linestyles="--")
+    ax.contour(Xf, Yf, Vf, levels=[0], colors="magenta",
+               linewidths=2, linestyles="--")
+    # Proxy artists for legend
+    ax.plot([], [], color="limegreen", ls="--", lw=2,
+            label=f"x-nullcline ($\\dot{{x}}=0$)")
+    ax.plot([], [], color="magenta", ls="--", lw=2,
+            label=f"y-nullcline ($\\dot{{y}}=0$)")
 
     # Streamplot with speed-based coloring
     norm = Normalize(vmin=speed.min(), vmax=speed.max())
@@ -86,6 +105,57 @@ def plot_phase_portrait(f_expr, g_expr, x, y,
     # Quiver (light background arrows)
     ax.quiver(X, Y, U / speed, V / speed, alpha=0.15, scale=35, width=0.003,
               color="gray")
+
+    # --- Separatrices at saddle points ---
+    def _integrate_separatrix(f_fn, g_fn, x0, y0, direction, T, xlim, ylim):
+        """Integrate a trajectory forward or backward from (x0, y0)."""
+        def rhs(t, state):
+            return [direction * f_fn(state[0], state[1]),
+                    direction * g_fn(state[0], state[1])]
+
+        def out_of_bounds(t, state):
+            margin = 0.5
+            return min(state[0] - (xlim[0] - margin),
+                       (xlim[1] + margin) - state[0],
+                       state[1] - (ylim[0] - margin),
+                       (ylim[1] + margin) - state[1])
+        out_of_bounds.terminal = True
+
+        sol = solve_ivp(rhs, [0, T], [x0, y0], max_step=0.02,
+                        events=out_of_bounds, dense_output=True)
+        return sol.y[0], sol.y[1]
+
+    for eq, (cls, eigs) in classifications.items():
+        if cls != "saddle":
+            continue
+        # Compute eigenvectors of Jacobian at saddle
+        J = sp.Matrix([
+            [sp.diff(f_expr, x), sp.diff(f_expr, y)],
+            [sp.diff(g_expr, x), sp.diff(g_expr, y)],
+        ])
+        J_at = J.subs({x: eq[0], y: eq[1]})
+        eigenpairs = J_at.eigenvects()
+        eps = 1e-3
+        T_sep = 20.0
+        sep_plotted = False
+        for eigenval, mult, vecs in eigenpairs:
+            ev = complex(eigenval)
+            vec = np.array([complex(vecs[0][0]), complex(vecs[0][1])]).real
+            vec = vec / np.linalg.norm(vec)
+            for sign in [1, -1]:
+                x0 = eq[0] + sign * eps * vec[0]
+                y0 = eq[1] + sign * eps * vec[1]
+                if ev.real > 0:
+                    # Unstable eigenvector: integrate forward
+                    sx, sy = _integrate_separatrix(
+                        f_func, g_func, x0, y0, 1, T_sep, xlim, ylim)
+                else:
+                    # Stable eigenvector: integrate backward (reverse time)
+                    sx, sy = _integrate_separatrix(
+                        f_func, g_func, x0, y0, -1, T_sep, xlim, ylim)
+                lbl = "separatrix" if not sep_plotted else None
+                ax.plot(sx, sy, color="gold", lw=2.2, zorder=4, label=lbl)
+                sep_plotted = True
 
     # --- Mark equilibria ---
     marker_style = {
