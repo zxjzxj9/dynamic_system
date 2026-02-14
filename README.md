@@ -1,4 +1,4 @@
-# dynamic_system
+# 2D Phase Portrait Generator for Dynamical Systems
 
 Phase portrait generator for 2D autonomous dynamical systems using SymPy, NumPy, and Matplotlib.
 
