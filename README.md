@@ -94,6 +94,35 @@ The parameter μ controls the strength of nonlinear damping and dramatically sha
 - **Moderate μ** (1.0, 1.5, 2.0): the cycle elongates and develops visible asymmetry as the nonlinear term becomes significant.
 - **Large μ** (3.0, 5.0): the cycle becomes a sharp-cornered "relaxation oscillation" — the system spends most of its time slowly drifting along the nullcline branches, punctuated by rapid jumps between them. The velocity spikes grow taller while the displacement amplitude stays near x ≈ ±2.
 
+## Homoclinic Orbit — Nonlinear Spring
+
+A conservative system with a homoclinic connection:
+
+$$\dot{x} = y, \quad \dot{y} = -\frac{k}{m}(1 + x)x$$
+
+with k/m = 1. The system has the conserved energy (Hamiltonian):
+
+$$H(x,y) = \frac{y^2}{2} + \frac{k}{m}\left(\frac{x^2}{2} + \frac{x^3}{3}\right)$$
+
+```bash
+python homoclinic.py
+```
+
+![Homoclinic Orbit](homoclinic.png)
+
+**Equilibria:**
+- **(0, 0)** — center (eigenvalues λ = ±i). Surrounded by a family of closed orbits (periodic oscillations).
+- **(-1, 0)** — saddle (eigenvalues λ = ±1). The unstable fixed point from which the homoclinic orbit departs and returns.
+
+**Key features visible in the portrait:**
+- **Gold loop** (homoclinic orbit): the level curve `H(x,y) = 1/6`, a single trajectory that leaves the saddle along its unstable manifold, loops around the center, and returns to the saddle along its stable manifold as t → ±∞. It separates qualitatively different types of motion.
+- **Gray contours inside the loop**: closed orbits with `H < 1/6` — bounded oscillations around the center.
+- **Gray contours outside the loop**: open orbits with `H > 1/6` — trajectories that escape to infinity rather than oscillating.
+- **Green dashed line** (x-nullcline): `y = 0`.
+- **Magenta dashed lines** (y-nullcline): `x = 0` and `x = -1`, intersecting at the two equilibria.
+
+The homoclinic orbit acts as a **separatrix** — it divides phase space into regions of qualitatively different dynamics (bounded oscillation vs. unbounded motion).
+
 ## Dependencies
 
 - sympy
