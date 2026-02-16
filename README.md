@@ -58,6 +58,32 @@ python lotka_volterra.py
 - **Gray contours**: level curves of the conserved quantity `H(x,y) = δx − γ ln x + βy − α ln y`, confirming that orbits are closed.
 - **Gold trajectories**: sample orbits showing the counter-clockwise cycling — prey peak is followed by predator peak with a phase lag.
 
+## Van der Pol Oscillator Example
+
+A nonlinear oscillator with self-sustaining oscillations:
+
+$$\dot{x} = y, \quad \dot{y} = \mu(1 - x^2)y - x$$
+
+with parameter μ = 1.5.
+
+```bash
+python van_der_pol.py
+```
+
+![Van der Pol Phase Portrait](van_der_pol.png)
+
+**Equilibrium:**
+- **(0, 0)** — unstable spiral (eigenvalues λ = 0.75 ± 0.661i). The origin repels all nearby trajectories outward.
+
+**Key features visible in the portrait:**
+- **Gold closed curve** (limit cycle): the unique stable periodic orbit. All trajectories — whether starting inside or outside — converge to this cycle. This is the hallmark of the Van der Pol oscillator.
+- **Orange trajectory** (from inside): starts near the origin and spirals outward toward the limit cycle.
+- **Blue trajectory** (from outside): starts far from the origin and spirals inward toward the limit cycle.
+- **Green dashed line** (x-nullcline, `dx/dt = 0`): the line `y = 0`.
+- **Magenta dashed curve** (y-nullcline, `dy/dt = 0`): the cubic `y = x / [μ(1 − x²)]`, with vertical asymptotes at x = ±1.
+
+The coexistence of an unstable equilibrium with a stable limit cycle is a classic example of a **Hopf bifurcation** — for μ > 0 the system always settles into sustained oscillations regardless of initial conditions.
+
 ## Dependencies
 
 - sympy
