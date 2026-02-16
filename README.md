@@ -84,6 +84,16 @@ python van_der_pol.py
 
 The coexistence of an unstable equilibrium with a stable limit cycle is a classic example of a **Hopf bifurcation** — for μ > 0 the system always settles into sustained oscillations regardless of initial conditions.
 
+### Limit Cycles Under Different μ
+
+![Van der Pol Limit Cycles](van_der_pol_limit_cycles.png)
+
+The parameter μ controls the strength of nonlinear damping and dramatically shapes the limit cycle:
+
+- **Small μ** (0.2, 0.5): the cycle is nearly circular — the oscillator behaves almost like a simple harmonic oscillator with a gentle amplitude-limiting nonlinearity.
+- **Moderate μ** (1.0, 1.5, 2.0): the cycle elongates and develops visible asymmetry as the nonlinear term becomes significant.
+- **Large μ** (3.0, 5.0): the cycle becomes a sharp-cornered "relaxation oscillation" — the system spends most of its time slowly drifting along the nullcline branches, punctuated by rapid jumps between them. The velocity spikes grow taller while the displacement amplitude stays near x ≈ ±2.
+
 ## Dependencies
 
 - sympy

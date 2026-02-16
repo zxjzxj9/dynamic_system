@@ -140,3 +140,47 @@ print("\n=== Van der Pol Equilibrium Points ===")
 for eq, (cls, eigs) in classifications.items():
     eig_str = ", ".join(f"{e:.4g}" for e in eigs)
     print(f"  ({eq[0]:.4f}, {eq[1]:.4f})  →  {cls}  (eigenvalues: {eig_str})")
+
+
+# ── Limit cycles for different μ values ──
+mu_values = [0.2, 0.5, 1.0, 1.5, 2.0, 3.0, 5.0]
+cmap = plt.cm.viridis
+colors = [cmap(i / (len(mu_values) - 1)) for i in range(len(mu_values))]
+
+fig2, ax2 = plt.subplots(figsize=(9, 9))
+
+for mu_val, color in zip(mu_values, colors):
+    def rhs_mu(t, s, _mu=mu_val):
+        return [s[1], _mu * (1 - s[0]**2) * s[1] - s[0]]
+
+    # Integrate long enough to settle onto the limit cycle
+    T_run = 100 if mu_val >= 3.0 else 60
+    sol = solve_ivp(rhs_mu, [0, T_run], [3.0, 0.0], max_step=0.01,
+                    rtol=1e-9, atol=1e-10)
+    # Extract last ~2 periods for a clean cycle
+    T_period = 2 * np.pi * (1 + mu_val**2 / 16)  # rough period estimate
+    t_mask = sol.t > sol.t[-1] - 2 * T_period
+    ax2.plot(sol.y[0][t_mask], sol.y[1][t_mask],
+             color=color, lw=2, label=f"μ = {mu_val}")
+
+ax2.plot(0, 0, marker="^", color="orange", markersize=10,
+         markeredgecolor="black", markeredgewidth=1.2, zorder=5,
+         label="unstable spiral (0, 0)")
+
+ax2.set_xlim(-5, 5)
+ax2.set_ylim(-5, 5)
+ax2.set_xlabel("x  (displacement)")
+ax2.set_ylabel("y  (velocity)")
+ax2.set_aspect("equal")
+ax2.legend(loc="upper right", fontsize=9)
+ax2.grid(True, alpha=0.3)
+ax2.set_title(
+    "Van der Pol Limit Cycles for Different μ\n"
+    r"$\dot{x} = y$,  $\dot{y} = \mu(1 - x^2)y - x$",
+    fontsize=12)
+
+plt.tight_layout()
+plt.savefig("van_der_pol_limit_cycles.png", dpi=150)
+plt.show()
+
+print("\n=== Limit cycles plotted for μ =", mu_values, "===")
