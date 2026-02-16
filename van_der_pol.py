@@ -37,7 +37,7 @@ for eq in equilibria:
     classifications[eq] = (cls, eigs)
 
 # ── Plot ──
-xlim, ylim = (-5, 5), (-8, 8)
+xlim, ylim = (-5, 5), (-5, 5)
 grid_n = 300
 qgrid = 30
 
