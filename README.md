@@ -160,6 +160,32 @@ The bifurcation diagram is a **fractal**: zooming into smaller regions reveals m
 
 This self-similarity at every scale is the hallmark of the logistic map's fractal structure and is a direct consequence of Feigenbaum universality.
 
+## Lorenz System — Strange Attractor
+
+A 3D continuous system exhibiting deterministic chaos:
+
+$$\dot{x} = \sigma(y - x), \quad \dot{y} = \rho x - xz - y, \quad \dot{z} = xy - \beta z$$
+
+with classic chaotic parameters σ = 10, ρ = 28, β = 8/3.
+
+```bash
+python lorenz.py
+```
+
+![Lorenz Strange Attractor](lorenz_attractor.png)
+
+**Equilibria (all unstable for these parameters):**
+- **(0, 0, 0)** — unstable saddle. One positive real eigenvalue drives trajectories away from the origin along the x-axis.
+- **C± = (±8.485, ±8.485, 27)** — unstable spirals. Complex eigenvalues with positive real part cause trajectories to spiral outward from each wing's center, sending them back across to the other wing.
+
+**Key features visible in the portrait:**
+- **Butterfly shape** (XZ projection): the trajectory winds around C⁺ for a while, then crosses to C⁻ and back — the number of loops on each side is unpredictable. This is the hallmark of the Lorenz attractor.
+- **Strange attractor**: despite being deterministic, the trajectory never repeats. It is confined to a fractal set of dimension ≈ 2.06 — more than a surface but less than a volume.
+- **Sensitive dependence on initial conditions**: two trajectories starting arbitrarily close will diverge exponentially, making long-term prediction impossible. This is the essence of chaos.
+- **Time coloring** (inferno colormap): reveals how the trajectory visits both wings over time, with no discernible periodic pattern.
+
+The three projections (XZ, XY, YZ) show complementary views of the same 3D trajectory, each emphasizing different aspects of the attractor's geometry.
+
 ## Dependencies
 
 - sympy
