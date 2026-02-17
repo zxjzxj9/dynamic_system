@@ -123,6 +123,43 @@ python homoclinic.py
 
 The homoclinic orbit acts as a **separatrix** — it divides phase space into regions of qualitatively different dynamics (bounded oscillation vs. unbounded motion).
 
+## Logistic Map — Bifurcation & Chaos
+
+A discrete-time system exhibiting the period-doubling route to chaos:
+
+$$x_{n+1} = r\, x_n\,(1 - x_n)$$
+
+```bash
+python logistic_map.py
+```
+
+### Bifurcation Diagram
+
+![Logistic Map Bifurcation Diagram](logistic_map_bifurcation.png)
+
+As the growth rate parameter r increases, the logistic map undergoes a cascade of **period-doubling bifurcations**:
+
+- **r = 3.0** — the stable fixed point splits into a period-2 cycle
+- **r ≈ 3.449** — period-2 → period-4
+- **r ≈ 3.544** — period-4 → period-8
+- **r ≈ 3.570** — onset of chaos (the accumulation point of infinitely many doublings)
+- **r ≈ 3.828** — a period-3 window emerges from within the chaotic regime
+
+The successive bifurcation intervals shrink by **Feigenbaum's constant** δ ≈ 4.669, a universal ratio that appears in any one-dimensional map with a quadratic maximum — not just the logistic map. This universality connects the logistic map to renormalization group ideas in statistical physics.
+
+### Self-Similarity
+
+![Logistic Map Self-Similarity](logistic_map_self_similarity.png)
+
+The bifurcation diagram is a **fractal**: zooming into smaller regions reveals miniature copies of the full diagram. Each panel above zooms into the highlighted rectangle of the previous one:
+
+1. **Full diagram** (r ∈ [2.5, 4.0]) — the complete period-doubling cascade and chaotic regime.
+2. **Period-doubling cascade** (r ∈ [3.4, 3.6]) — successive bifurcations converging to the Feigenbaum point.
+3. **Period-3 window** (r ∈ [3.82, 3.86]) — a stable period-3 cycle that itself undergoes period-doubling, creating a miniature copy of the full diagram.
+4. **Deep zoom** (r ∈ [3.845, 3.857]) — the period-3 window's own cascade, structurally identical to the original.
+
+This self-similarity at every scale is the hallmark of the logistic map's fractal structure and is a direct consequence of Feigenbaum universality.
+
 ## Dependencies
 
 - sympy
