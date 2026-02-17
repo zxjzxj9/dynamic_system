@@ -98,21 +98,18 @@ for ax, h_data, v_data, h_label, v_label, title in panels:
     # Equilibria
     h_idx, v_idx = axis_map[h_label], axis_map[v_label]
     for eq, label in equilibria:
-        ax.plot(eq[h_idx], eq[v_idx], "o", color="lime", markersize=6,
+        ax.plot(eq[h_idx], eq[v_idx], "o", color="crimson", markersize=6,
                 markeredgecolor="black", markeredgewidth=0.8, zorder=5)
         ax.annotate(label, xy=(eq[h_idx], eq[v_idx]),
                     xytext=(8, 8), textcoords="offset points",
-                    fontsize=7.5, color="white",
-                    bbox=dict(boxstyle="round,pad=0.2", fc="black", alpha=0.7))
+                    fontsize=7.5, color="black",
+                    bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="gray",
+                              alpha=0.85))
 
     ax.set_xlabel(h_label, fontsize=11)
     ax.set_ylabel(v_label, fontsize=11)
     ax.set_title(title, fontsize=12)
-    ax.set_facecolor("#1a1a2e")
-    ax.grid(True, alpha=0.15, color="white")
-    ax.tick_params(colors="0.6")
-    for spine in ax.spines.values():
-        spine.set_color("0.4")
+    ax.grid(True, alpha=0.2)
 
 # Colorbar for time
 sm = plt.cm.ScalarMappable(cmap="inferno",
@@ -122,15 +119,13 @@ cbar = fig.colorbar(sm, ax=[ax_xz, ax_xy, ax_yz], location="bottom",
                     fraction=0.04, pad=0.08, aspect=60)
 cbar.set_label("Time (t)", fontsize=11)
 
-fig.patch.set_facecolor("#0f0f23")
 fig.suptitle(
     "Lorenz Strange Attractor\n"
     r"$\dot{x}=\sigma(y-x),\quad \dot{y}=\rho x - xz - y,\quad \dot{z}=xy - \beta z$"
     f"\n(σ={sigma:.0f}, ρ={rho:.0f}, β=8/3)",
-    fontsize=14, color="white", y=0.98)
+    fontsize=14, y=0.98)
 
-plt.savefig("lorenz_attractor.png", dpi=150, bbox_inches="tight",
-            facecolor=fig.get_facecolor())
+plt.savefig("lorenz_attractor.png", dpi=150, bbox_inches="tight")
 print("Saved lorenz_attractor.png")
 
 plt.show()
