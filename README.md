@@ -186,6 +186,27 @@ python lorenz.py
 
 The three projections (XZ, XY, YZ) show complementary views of the same 3D trajectory, each emphasizing different aspects of the attractor's geometry.
 
+### Poincaré Sections
+
+A Poincaré section records where the trajectory pierces a chosen plane, collapsing the continuous 3D flow into a discrete 2D map. This reveals the fractal microstructure hidden within the strange attractor.
+
+```bash
+python lorenz_poincare.py
+```
+
+![Lorenz Poincaré Sections](lorenz_poincare.png)
+
+Three sections through the attractor (long integration, t ∈ [20, 1000]):
+
+1. **z = 27 (= ρ−1), upward crossings** → plot (x, y). This plane passes through the two unstable equilibria C±. The section shows two thin curved bands — one for each wing of the attractor.
+2. **x = 0, rightward crossings** → plot (y, z). The symmetry plane of the Lorenz system. The curved band traces the trajectory's transition between the two lobes.
+3. **y = 0, crossings with ẏ > 0** → plot (x, z). Shows the attractor sliced through a different symmetry, revealing a complementary band structure.
+
+**Key features:**
+- **Fractal banding**: each apparent "line" is actually composed of infinitely many sub-bands at finer scales — a Cantor-like structure with non-integer dimension. This is the geometric signature of the strange attractor.
+- **Deterministic structure**: despite the chaotic dynamics, the crossings are confined to thin, well-defined curves rather than filling a 2D region. The attractor has dimension ≈ 2.06, so its Poincaré sections are nearly one-dimensional.
+- **No periodicity**: points never exactly repeat, confirming the aperiodic nature of the Lorenz system.
+
 ## Dependencies
 
 - sympy
