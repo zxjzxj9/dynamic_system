@@ -207,6 +207,42 @@ Three sections through the attractor (long integration, t ∈ [20, 1000]):
 - **Deterministic structure**: despite the chaotic dynamics, the crossings are confined to thin, well-defined curves rather than filling a 2D region. The attractor has dimension ≈ 2.06, so its Poincaré sections are nearly one-dimensional.
 - **No periodicity**: points never exactly repeat, confirming the aperiodic nature of the Lorenz system.
 
+## Forced Duffing Oscillator — Route to Chaos
+
+A nonlinear oscillator driven by a periodic force, exhibiting a transition from regular to chaotic motion:
+
+$$\ddot{x} + \delta\dot{x} - x + x^3 = a\sin(\omega t)$$
+
+with δ = 0.25 (damping) and ω = 1.0 (driving frequency). The double-well potential $V(x) = -x^2/2 + x^4/4$ has minima at $x = \pm 1$.
+
+```bash
+python duffing.py
+```
+
+### Phase Portraits
+
+![Duffing Phase Portraits](duffing_phase_portraits.png)
+
+Four forcing amplitudes reveal the route to chaos:
+
+- **a = 0.00** — unforced: the trajectory sits near the equilibrium at x = 1 (right well). Without forcing, the damped system simply decays to the bottom of whichever well it starts in.
+- **a = 0.25** — period-1: forcing drives a single closed orbit confined to the right well. The stroboscopic Poincaré section (red dots, sampled once per driving period) collapses to a single point — the hallmark of a periodic response.
+- **a = 0.30** — chaos: the orbit has escaped its home well via a **boundary crisis** and wanders unpredictably between both wells. The Poincaré section scatters across a complex region — no two driving cycles produce the same state.
+- **a = 0.50** — periodic window: order re-emerges. The system settles into a large-amplitude period-1 orbit that encircles both wells. Periodic windows embedded within the chaotic regime are a universal feature of nonlinear systems.
+
+### Bifurcation Diagram
+
+![Duffing Bifurcation Diagram](duffing_bifurcation.png)
+
+The stroboscopic bifurcation diagram sweeps forcing amplitude a ∈ [0.1, 0.7]:
+
+- **a < 0.26** — a single line: the system responds periodically (period-1) within one potential well.
+- **a ≈ 0.26** — **boundary crisis**: the orbit abruptly escapes its well. The stroboscopic points explode from a single line into a broad chaotic band spanning both wells (x ≈ −1.5 to +1.1).
+- **a ≈ 0.26–0.45** — chaotic regime with visible **periodic windows** (narrow vertical gaps where the system briefly returns to periodic behavior).
+- **a > 0.45** — the system re-stabilizes into a large-amplitude periodic orbit around both wells.
+
+Unlike the logistic map's gradual period-doubling cascade, the Duffing oscillator's route to chaos here is a **crisis bifurcation** — an abrupt, discontinuous transition triggered when the periodic orbit collides with the boundary of its basin of attraction.
+
 ## Dependencies
 
 - sympy
