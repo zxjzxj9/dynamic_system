@@ -243,6 +243,45 @@ The stroboscopic bifurcation diagram sweeps forcing amplitude a ∈ [0.1, 0.7]:
 
 Unlike the logistic map's gradual period-doubling cascade, the Duffing oscillator's route to chaos here is a **crisis bifurcation** — an abrupt, discontinuous transition triggered when the periodic orbit collides with the boundary of its basin of attraction.
 
+## Lozi Map — Orbit Structure and Chaos
+
+A piecewise-linear 2D discrete map that produces a strange attractor:
+
+$$x_{n+1} = 1 - a\,|x_n| + b\,y_n, \quad y_{n+1} = x_n$$
+
+with classic chaotic parameters a = 1.7, b = 0.5. The absolute value makes the map piecewise-linear, producing sharp folds instead of the smooth curves seen in the Hénon map.
+
+```bash
+python lozi_map_chaos.py
+```
+
+### Strange Attractor
+
+![Lozi Strange Attractor](lozi_attractor.png)
+
+The attractor has a characteristic angular, tent-like shape with visible fractal banding — each apparent line resolves into parallel sub-bands at finer scales. Unlike the Hénon attractor's smooth parabolic folds, the Lozi attractor's structure is built entirely from straight-line segments meeting at sharp corners, a direct consequence of the |x| nonlinearity.
+
+### Sensitive Dependence on Initial Conditions
+
+![Lozi Sensitivity](lozi_sensitivity.png)
+
+Two orbits starting at x₀ = 0 and x₀ = 10⁻⁸ (a perturbation smaller than the diameter of an atom):
+
+- **Top panel**: both x-trajectories track identically for ~30 iterations, then diverge completely — the trajectories become uncorrelated.
+- **Bottom panel**: the separation |Δxₙ| grows exponentially (roughly linear on the log scale), confirming a positive Lyapunov exponent — the defining signature of chaos.
+
+### Bifurcation Diagram
+
+![Lozi Bifurcation Diagram](lozi_bifurcation.png)
+
+Sweeping the nonlinearity parameter a with b = 0.5 fixed:
+
+- **a < 0.5** — a single stable fixed point.
+- **a = 0.5** — period-doubling bifurcation to a 2-cycle.
+- **a ≈ 0.5–1.5** — stable period-2 orbit (two branches visible).
+- **a ≈ 1.5** — onset of further bifurcations. Unlike the logistic map's smooth period-doubling cascade, the Lozi map transitions to chaos through **border-collision bifurcations** — abrupt, discontinuous changes caused by the orbit hitting the non-smooth boundary at x = 0.
+- **a = 1.7** — full chaos (marked with dashed line). The attractor shown above lives here.
+
 ## Dependencies
 
 - sympy
