@@ -282,6 +282,28 @@ Sweeping the nonlinearity parameter a with b = 0.5 fixed:
 - **a ≈ 1.5** — onset of further bifurcations. Unlike the logistic map's smooth period-doubling cascade, the Lozi map transitions to chaos through **border-collision bifurcations** — abrupt, discontinuous changes caused by the orbit hitting the non-smooth boundary at x = 0.
 - **a = 1.7** — full chaos (marked with dashed line). The attractor shown above lives here.
 
+## Standard Map — Poincaré-Birkhoff Theorem
+
+The standard (Chirikov) map is an area-preserving twist map on the torus:
+
+$$y_{n+1} = y_n + \frac{K}{2\pi}\sin(2\pi x_n) \pmod{1}, \quad x_{n+1} = x_n + y_{n+1} \pmod{1}$$
+
+At K = 0 the map is integrable — every orbit lies on a horizontal line y = const. As K increases, the **Poincaré-Birkhoff theorem** predicts that rational tori (those with rational winding number p/q) break up, leaving behind exactly 2q fixed points of the q-th iterate, alternating between elliptic (stable) and hyperbolic (unstable). Irrational tori persist as **KAM curves** until K is large enough to destroy them.
+
+```bash
+python standard_map.py
+```
+
+![Standard Map](standard_map.png)
+
+At K = 0.8, three types of structure coexist:
+
+- **KAM tori** (smooth colored curves): surviving irrational tori that thread continuously across the plot. These act as barriers — chaotic orbits cannot cross them.
+- **Island chains**: the destroyed rational tori predicted by Poincaré-Birkhoff. The large elliptical islands near y ≈ 0.5 are the period-1 resonance (winding number 1/2); smaller chains near y ≈ 1/3 and y ≈ 2/3 correspond to higher-order resonances. Each island contains its own nested KAM curves and sub-islands — the structure is self-similar.
+- **Chaotic sea**: the scattered, mottled regions surrounding the hyperbolic fixed points. Orbits in the chaotic sea wander ergodically but are confined between surviving KAM tori.
+
+This is the hallmark of **Hamiltonian chaos**: unlike dissipative systems (Lorenz, Duffing) where chaos fills a strange attractor, conservative systems partition phase space into an intricate mixture of regular islands and chaotic seas — the **KAM picture**.
+
 ## Dependencies
 
 - sympy
