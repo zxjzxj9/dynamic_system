@@ -304,6 +304,31 @@ At K = 0.8, three types of structure coexist:
 
 This is the hallmark of **Hamiltonian chaos**: unlike dissipative systems (Lorenz, Duffing) where chaos fills a strange attractor, conservative systems partition phase space into an intricate mixture of regular islands and chaotic seas — the **KAM picture**.
 
+## Kicked Rotator — Resonance Overlap and the Onset of Chaos
+
+The kicked rotator is a free rotor receiving periodic impulses:
+
+$$H = \frac{p^2}{2} + K\cos(\theta)\sum_n \delta(t - n)$$
+
+Its stroboscopic Poincaré section (sampled once per kick period) is exactly the standard map. The kick strength K controls how strongly the rotor is perturbed each period.
+
+```bash
+python kicked_rotator.py
+```
+
+![Kicked Rotator](kicked_rotator.png)
+
+Six panels show the phase portrait as K increases from integrable to fully chaotic:
+
+- **K = 0** (integrable): all orbits lie on horizontal lines p = const — the rotor spins freely at constant angular momentum.
+- **K = 0.5**: primary resonance islands appear (visible near p ≈ 0 and p ≈ 0.5), but all KAM tori survive as continuous curves separating them. Chaotic motion is impossible — orbits are trapped between barriers.
+- **K = 0.8**: islands have grown, thin chaotic layers surround the hyperbolic points, but KAM tori still confine the chaos.
+- **K = 0.9716** (critical, K_c): the **last KAM torus breaks**. This is the **Chirikov resonance overlap criterion** — neighboring resonance islands have grown large enough to touch, and the chaotic layers merge into a connected sea. For the first time, an orbit can diffuse across the entire phase space.
+- **K = 1.5**: a large chaotic sea dominates, with surviving islands visible as white voids. The remaining KAM curves are few and far between.
+- **K = 3.0**: nearly global chaos. Only tiny island remnants survive — the system is almost fully ergodic.
+
+The critical value K_c ≈ 0.9716 is a fundamental threshold in Hamiltonian dynamics: below it, phase space is divided into disconnected regions by KAM barriers; above it, global transport (diffusion in momentum) becomes possible. This transition from confined to unbounded chaos is the **resonance overlap mechanism** — the primary route to chaos in Hamiltonian systems.
+
 ## Dependencies
 
 - sympy
