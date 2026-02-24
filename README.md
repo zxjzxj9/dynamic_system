@@ -329,6 +329,30 @@ Six panels show the phase portrait as K increases from integrable to fully chaot
 
 The critical value K_c ≈ 0.9716 is a fundamental threshold in Hamiltonian dynamics: below it, phase space is divided into disconnected regions by KAM barriers; above it, global transport (diffusion in momentum) becomes possible. This transition from confined to unbounded chaos is the **resonance overlap mechanism** — the primary route to chaos in Hamiltonian systems.
 
+## Kicked Harmonic Oscillator — Stochastic Web
+
+A harmonic oscillator receiving periodic delta-function kicks:
+
+$$H = \frac{p^2}{2} + \frac{\omega^2 x^2}{2} + K\cos(x)\sum_n \delta(t - nT)$$
+
+When the oscillator frequency is **resonant** with the kick period ($\omega T = 2\pi/q$ for integer q), the stroboscopic map produces a **stochastic web** — a lattice of thin chaotic channels with q-fold symmetry. For q = 4 (quarter-turn resonance), the map reduces to:
+
+$$x_{n+1} = p_n + K\sin(x_n), \quad p_{n+1} = -x_n$$
+
+```bash
+python kicked_harmonic.py
+```
+
+![Stochastic Web](kicked_harmonic_web.png)
+
+The diffusion map (K = 3.0) reveals the web's structure by coloring each initial condition by how far its orbit travels:
+
+- **Dark grid channels** (stochastic web): thin chaotic filaments forming a perfect square lattice with spacing 2π. Orbits launched on the web diffuse freely along these channels to arbitrarily large distances — this is **unbounded chaotic transport** in a Hamiltonian system.
+- **Bright patches** (regular cells): KAM-like islands trapped between the web channels. Orbits inside these cells are confined forever — they oscillate on invariant curves and never escape.
+- **Square lattice symmetry**: the q = 4 resonance produces a web with 4-fold rotational symmetry. Other resonances (q = 3, 6) produce hexagonal/triangular webs.
+
+The stochastic web is a striking example of **Arnold diffusion** — in generic Hamiltonian systems with more than two degrees of freedom, thin chaotic channels connect distant regions of phase space, allowing slow but unbounded transport. The kicked harmonic oscillator is one of the few systems where this web structure is exactly periodic and analytically tractable.
+
 ## Dependencies
 
 - sympy
