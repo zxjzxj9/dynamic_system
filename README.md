@@ -353,6 +353,42 @@ The diffusion map (K = 3.0) reveals the web's structure by coloring each initial
 
 The stochastic web is a striking example of **Arnold diffusion** — in generic Hamiltonian systems with more than two degrees of freedom, thin chaotic channels connect distant regions of phase space, allowing slow but unbounded transport. The kicked harmonic oscillator is one of the few systems where this web structure is exactly periodic and analytically tractable.
 
+---
+
+## Coupled Oscillators — Phase Locking and Frequency Locking
+
+Two Kuramoto oscillators with different natural frequencies, coupled with strength K:
+
+$$\dot{\theta}_1 = \omega_1 + K\sin(\theta_2 - \theta_1), \quad \dot{\theta}_2 = \omega_2 + K\sin(\theta_1 - \theta_2)$$
+
+The phase difference Δθ = θ₁ − θ₂ obeys a single equation: dΔθ/dt = Δω − 2K sin(Δθ). When the coupling exceeds the critical value K_c = |Δω|/2, the oscillators **phase-lock** (Δθ → constant) and **frequency-lock** (their effective frequencies become identical).
+
+```bash
+python coupled_oscillators.py
+```
+
+### Phase Locking
+
+![Phase Locking](coupled_phase_locking.png)
+
+Three coupling regimes with ω₁ = 1.0, ω₂ = 1.5 (K_c = 0.25):
+
+- **K = 0.1 (unlocked)**: the phase difference Δθ(t) drifts indefinitely — the faster oscillator continually laps the slower one.
+- **K = 0.25 (critical)**: Δθ decays algebraically slowly toward a constant — the system is marginally locked.
+- **K = 0.6 (locked)**: Δθ converges exponentially to a fixed value — the oscillators maintain a constant phase relationship despite their different natural frequencies.
+
+### Frequency Locking
+
+![Frequency Locking](coupled_freq_locking.png)
+
+As coupling K increases, the effective (time-averaged) frequencies of the two oscillators are pulled toward each other. At K_c = 0.25 they merge: both oscillators rotate at the same rate (ω₁ + ω₂)/2 = 1.25. This is **frequency entrainment** — a weaker oscillator is captured by the coupling and forced to match the common frequency.
+
+### Arnold Tongue
+
+![Arnold Tongue](coupled_arnold_tongue.png)
+
+The Arnold tongue maps the locking region in parameter space (Δω, K). The V-shaped shaded region shows where oscillators are phase-locked. The boundary K = |Δω|/2 is exact for two Kuramoto oscillators. Points outside the tongue correspond to unlocked (drifting) oscillators. The three markers show the parameters used in the phase locking figure above. Arnold tongues generalize to higher-order resonances and form the backbone of synchronization theory in coupled oscillator networks.
+
 ## Dependencies
 
 - sympy
