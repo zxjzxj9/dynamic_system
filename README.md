@@ -389,6 +389,20 @@ As coupling K increases, the effective (time-averaged) frequencies of the two os
 
 The Arnold tongue maps the locking region in parameter space (Δω, K). The V-shaped shaded region shows where oscillators are phase-locked. The boundary K = |Δω|/2 is exact for two Kuramoto oscillators. Points outside the tongue correspond to unlocked (drifting) oscillators. The three markers show the parameters used in the phase locking figure above. Arnold tongues generalize to higher-order resonances and form the backbone of synchronization theory in coupled oscillator networks.
 
+### Phase Space — Attractor and Repeller
+
+![Phase Space](coupled_phase_space.png)
+
+The phase difference Δθ lives on a circle, and its dynamics are governed by dΔθ/dt = Δω − 2K sin(Δθ). The top panel plots this "velocity" as a function of Δθ for several coupling strengths:
+
+- **K = 0.1 < K_c** (red dashed): the curve never crosses zero — there are no fixed points, so Δθ drifts continuously (unlocked).
+- **K = 0.25 = K_c** (gray dash-dot): the curve just touches zero tangentially — a **saddle-node bifurcation** creates a half-stable fixed point.
+- **K = 0.4, 0.6 > K_c** (blue, green): the curve crosses zero at two points:
+  - **Attractor** (filled circle): where dΔθ/dt crosses from positive to negative — the phase difference is pulled toward this value. Small perturbations decay back exponentially.
+  - **Repeller** (open circle): where dΔθ/dt crosses from negative to positive — an unstable fixed point. Any perturbation drives the system away toward the attractor.
+
+The bottom panel shows the flow on the phase circle for K = 0.6. Arrows indicate the direction of phase evolution: all orbits are funneled toward the attractor and repelled from the unstable fixed point. This is a **saddle-node bifurcation on a circle** (SNIC) — the canonical mechanism for the transition from oscillatory (unlocked) to stationary (locked) behavior in coupled oscillator systems.
+
 ## Dependencies
 
 - sympy

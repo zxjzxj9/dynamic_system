@@ -175,6 +175,161 @@ plt.tight_layout()
 plt.savefig("coupled_arnold_tongue.png", dpi=150)
 print("Saved coupled_arnold_tongue.png")
 
+
+# ══════════════════════════════════════════════════════════════════
+# Figure 4: Phase Space — Attractor and Repeller
+# ══════════════════════════════════════════════════════════════════
+
+print("Computing phase space attractor/repeller diagram...")
+
+dtheta = np.linspace(-np.pi, np.pi, 1000)
+
+K_phase_values = [
+    (0.1,  "C3", "--", f"K = 0.1 < K_c (no fixed points)"),
+    (0.25, "gray", "-.", f"K = 0.25 = K_c (saddle-node)"),
+    (0.4,  "C0", "-",  f"K = 0.4 > K_c"),
+    (0.6,  "C2", "-",  f"K = 0.6 > K_c"),
+]
+
+fig, (ax_top, ax_bot) = plt.subplots(2, 1, figsize=(12, 10),
+                                      gridspec_kw={"height_ratios": [3, 2]})
+
+# ── Top panel: dΔθ/dt vs Δθ ──
+
+ax_top.axhline(0, color="black", lw=0.5)
+
+for K, color, ls, label in K_phase_values:
+    ddtheta = Delta_omega - 2 * K * np.sin(dtheta)
+    ax_top.plot(dtheta, ddtheta, color=color, ls=ls, lw=1.8, label=label)
+
+    # Mark fixed points for locked cases
+    if K >= K_c:
+        ratio = Delta_omega / (2 * K)
+        ratio = np.clip(ratio, -1, 1)
+        # Stable fixed point (attractor)
+        fp_stable = np.arcsin(ratio)
+        # Unstable fixed point (repeller)
+        fp_unstable = np.pi - np.arcsin(ratio)
+        # Wrap to [-π, π]
+        if fp_unstable > np.pi:
+            fp_unstable -= 2 * np.pi
+
+        ax_top.plot(fp_stable, 0, "o", color=color, ms=10, mfc=color,
+                    mec="black", mew=1.2, zorder=5)
+        ax_top.plot(fp_unstable, 0, "o", color=color, ms=10, mfc="white",
+                    mec=color, mew=2.0, zorder=5)
+
+# Legend entries for fixed point markers
+ax_top.plot([], [], "ko", ms=8, mfc="black", label="Attractor (stable)")
+ax_top.plot([], [], "o", color="black", ms=8, mfc="white", mew=2.0,
+            label="Repeller (unstable)")
+
+ax_top.set_xlabel(r"Phase difference $\Delta\theta$", fontsize=12)
+ax_top.set_ylabel(r"$d\Delta\theta / dt$", fontsize=12)
+ax_top.set_title(
+    r"Phase Space: $d\Delta\theta/dt = \Delta\omega - 2K\sin(\Delta\theta)$"
+    "\n"
+    r"Saddle-node bifurcation on a circle"
+    f"   ($\\Delta\\omega = {Delta_omega}$)",
+    fontsize=13)
+ax_top.set_xlim(-np.pi, np.pi)
+ax_top.set_xticks([-np.pi, -np.pi/2, 0, np.pi/2, np.pi])
+ax_top.set_xticklabels([r"$-\pi$", r"$-\pi/2$", r"$0$",
+                         r"$\pi/2$", r"$\pi$"])
+ax_top.legend(fontsize=9, loc="upper right")
+ax_top.grid(True, alpha=0.2)
+
+# Add flow arrows on the K=0.6 curve
+K_arrow = 0.6
+ddtheta_arrow = Delta_omega - 2 * K_arrow * np.sin(dtheta)
+ratio_arrow = np.clip(Delta_omega / (2 * K_arrow), -1, 1)
+fp_s = np.arcsin(ratio_arrow)
+fp_u = np.pi - np.arcsin(ratio_arrow)
+if fp_u > np.pi:
+    fp_u -= 2 * np.pi
+
+# Arrow positions: between repeller and attractor on each side
+arrow_positions = [
+    (fp_s + fp_u) / 2,            # between attractor and repeller (flowing toward attractor)
+    fp_s - 0.8,                    # left of attractor (flowing toward attractor)
+    fp_u + 0.5 if fp_u + 0.5 < np.pi else fp_u - 2.5,  # near repeller (flowing away)
+]
+for ap in arrow_positions:
+    val = Delta_omega - 2 * K_arrow * np.sin(ap)
+    direction = 1 if val > 0 else -1
+    ax_top.annotate("", xy=(ap + direction * 0.15, val),
+                    xytext=(ap - direction * 0.15, val),
+                    arrowprops=dict(arrowstyle="->", color="C2", lw=2.0))
+
+# ── Bottom panel: flow on the circle for K = 0.6 ──
+
+K_circ = 0.6
+ratio_circ = np.clip(Delta_omega / (2 * K_circ), -1, 1)
+fp_stable_circ = np.arcsin(ratio_circ)
+fp_unstable_circ = np.pi - np.arcsin(ratio_circ)
+if fp_unstable_circ > np.pi:
+    fp_unstable_circ -= 2 * np.pi
+
+# Draw the circle
+theta_circle = np.linspace(0, 2 * np.pi, 300)
+R = 1.0
+cx, cy = 0.0, 0.0
+ax_bot.plot(cx + R * np.cos(theta_circle), cy + R * np.sin(theta_circle),
+            "k-", lw=1.5)
+ax_bot.set_aspect("equal")
+
+# Mark attractor and repeller on circle
+ax_bot.plot(R * np.cos(fp_stable_circ), R * np.sin(fp_stable_circ),
+            "o", color="C2", ms=14, mfc="C2", mec="black", mew=1.5, zorder=5)
+ax_bot.annotate("Attractor\n" + rf"$\Delta\theta^* = {fp_stable_circ:.2f}$",
+                xy=(R * np.cos(fp_stable_circ), R * np.sin(fp_stable_circ)),
+                xytext=(R * np.cos(fp_stable_circ) - 0.9,
+                        R * np.sin(fp_stable_circ) - 0.5),
+                fontsize=10, ha="center",
+                arrowprops=dict(arrowstyle="->", color="black", lw=1.2))
+
+ax_bot.plot(R * np.cos(fp_unstable_circ), R * np.sin(fp_unstable_circ),
+            "o", color="C2", ms=14, mfc="white", mec="C2", mew=2.5, zorder=5)
+ax_bot.annotate("Repeller\n" + rf"$\Delta\theta^* = {fp_unstable_circ:.2f}$",
+                xy=(R * np.cos(fp_unstable_circ), R * np.sin(fp_unstable_circ)),
+                xytext=(R * np.cos(fp_unstable_circ) + 0.9,
+                        R * np.sin(fp_unstable_circ) + 0.5),
+                fontsize=10, ha="center",
+                arrowprops=dict(arrowstyle="->", color="black", lw=1.2))
+
+# Draw flow arrows around the circle
+n_arrows = 12
+for i in range(n_arrows):
+    angle = -np.pi + (2 * np.pi * i / n_arrows)
+    # Skip if too close to fixed points
+    if min(abs(angle - fp_stable_circ), abs(angle - fp_unstable_circ)) < 0.3:
+        continue
+    flow = Delta_omega - 2 * K_circ * np.sin(angle)
+    # Arrow tangent to circle
+    tangent_x = -np.sin(angle)
+    tangent_y = np.cos(angle)
+    sign = 1 if flow > 0 else -1
+    arrow_len = 0.12
+    x0 = R * np.cos(angle)
+    y0 = R * np.sin(angle)
+    dx = sign * arrow_len * tangent_x
+    dy = sign * arrow_len * tangent_y
+    ax_bot.annotate("", xy=(x0 + dx, y0 + dy), xytext=(x0, y0),
+                    arrowprops=dict(arrowstyle="-|>", color="C0",
+                                    lw=1.8, mutation_scale=15))
+
+ax_bot.set_xlim(-2.0, 2.0)
+ax_bot.set_ylim(-1.6, 1.6)
+ax_bot.set_title(
+    f"Flow on the Phase Circle (K = {K_circ})\n"
+    "All orbits flow toward the attractor, away from the repeller",
+    fontsize=12)
+ax_bot.axis("off")
+
+plt.tight_layout()
+plt.savefig("coupled_phase_space.png", dpi=150)
+print("Saved coupled_phase_space.png")
+
 plt.show()
 
 print("\n=== Coupled Oscillators Summary ===")
