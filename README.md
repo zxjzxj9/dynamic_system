@@ -403,6 +403,40 @@ The phase difference Δθ lives on a circle, and its dynamics are governed by d�
 
 The bottom panel shows the flow on the phase circle for K = 0.6. Arrows indicate the direction of phase evolution: all orbits are funneled toward the attractor and repelled from the unstable fixed point. This is a **saddle-node bifurcation on a circle** (SNIC) — the canonical mechanism for the transition from oscillatory (unlocked) to stationary (locked) behavior in coupled oscillator systems.
 
+---
+
+## Sine-Circle Map — Arnold Tongues and the Devil's Staircase
+
+$$\theta_{n+1} = \theta_n + \Omega - \frac{K}{2\pi}\sin(2\pi\theta_n) \pmod{1}$$
+
+A circle map parameterized by the bare rotation number Ω and coupling strength K. At K = 0 it is a rigid rotation (W = Ω). As K increases, mode-locking regions (Arnold tongues) grow around every rational Ω, and the winding number W develops flat plateaus — rational values at which the oscillator is locked to a periodic orbit.
+
+```bash
+python sine_circle_map.py
+```
+
+### Devil's Staircase
+
+![Devil's Staircase](sine_circle_staircase.png)
+
+The winding number W as a function of Ω for increasing K:
+
+- **K = 0** (dashed): W = Ω, a straight diagonal — every rotation number is realized.
+- **K = 0.5, 0.8**: flat plateaus appear at prominent rationals (1/3, 1/2, 2/3, etc.) and widen with K. Between plateaus, irrational winding numbers still survive.
+- **K = 1.0** (critical): the **devil's staircase** — a continuous, non-decreasing function that is locally constant (flat) almost everywhere. The set of Ω values with irrational W has measure zero, yet the function has no jumps. This is a fractal object: the plateaus form a dense, self-similar hierarchy at every scale.
+
+### Arnold Tongues
+
+![Arnold Tongues](sine_circle_tongues.png)
+
+The Arnold tongue diagram maps the winding number W(Ω, K) across the full parameter space. Each uniform-color stripe is a mode-locking tongue — a region where the map has a specific rational winding number:
+
+- **Below K = 1**: tongues emanate as thin wedges from every rational Ω on the K = 0 axis and widen with K. Between tongues, quasiperiodic orbits with irrational W persist on KAM-like invariant circles.
+- **At K = 1** (critical line): tongues fill almost all of parameter space. The map is at the boundary of invertibility.
+- **Above K = 1**: the map becomes non-invertible, tongues overlap, and chaotic behavior appears in the overlap regions. The orderly tongue structure breaks down.
+
+The largest tongues correspond to the simplest rationals (1/2, 1/3, 2/3), while thinner tongues at higher-order rationals (2/5, 3/7, ...) nest between them in a Farey-tree hierarchy. This structure is universal — it appears in any nonlinear oscillator driven by a periodic force.
+
 ## Dependencies
 
 - sympy
