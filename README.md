@@ -403,6 +403,18 @@ The phase difference Δθ lives on a circle, and its dynamics are governed by d�
 
 The bottom panel shows the flow on the phase circle for K = 0.6. Arrows indicate the direction of phase evolution: all orbits are funneled toward the attractor and repelled from the unstable fixed point. This is a **saddle-node bifurcation on a circle** (SNIC) — the canonical mechanism for the transition from oscillatory (unlocked) to stationary (locked) behavior in coupled oscillator systems.
 
+### Critical Slowing Down
+
+![Critical Slowing Down](coupled_critical_slowing.png)
+
+At fixed coupling K = 0.6, increasing the frequency detuning Δω toward the critical value Δω_c = 2K = 1.2 reveals **critical slowing down** — the universal phenomenon where relaxation becomes infinitely slow near a bifurcation:
+
+- **Top panel**: time series of Δθ(t) for increasing Δω. At small Δω (deep inside the tongue), the phase difference locks rapidly. As Δω → Δω_c, the relaxation becomes dramatically slower — the system takes longer and longer to settle onto the locked state.
+- **Bottom-left**: the relaxation time τ vs Δω. Theory predicts τ = 1/√(4K² − Δω²) (red curve), which diverges as Δω → 2K. Numerical measurements (black dots) match the theoretical scaling. This 1/√(ε) divergence is the hallmark of a **saddle-node bifurcation** — as the attractor and repeller approach each other, the "flow speed" near the fixed point vanishes.
+- **Bottom-right**: the path through the Arnold tongue. The red arrow shows the trajectory from Δω = 0 (center of the tongue) toward the boundary at Δω_c = 1.2 (gold star). Each dot marks one of the Δω values shown in the time series.
+
+Critical slowing down is not just a mathematical curiosity — it serves as an **early warning signal** for tipping points in climate systems, ecosystems, financial markets, and neural networks. The increasing relaxation time can be detected in data before the actual transition occurs.
+
 ---
 
 ## Sine-Circle Map — Arnold Tongues and the Devil's Staircase

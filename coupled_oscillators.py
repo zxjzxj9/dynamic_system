@@ -330,6 +330,166 @@ plt.tight_layout()
 plt.savefig("coupled_phase_space.png", dpi=150)
 print("Saved coupled_phase_space.png")
 
+
+# ══════════════════════════════════════════════════════════════════
+# Figure 5: Critical Slowing Down (fixed K, increasing |Δω|)
+# ══════════════════════════════════════════════════════════════════
+
+print("Computing critical slowing down...")
+
+K_fixed = 0.6
+Dw_critical = 2 * K_fixed  # = 1.2
+
+# Panel layout: top = time series, bottom left = relaxation time, bottom right = Arnold tongue path
+fig = plt.figure(figsize=(14, 12))
+gs = fig.add_gridspec(2, 2, height_ratios=[1.2, 1], hspace=0.35, wspace=0.3)
+ax_ts = fig.add_subplot(gs[0, :])
+ax_tau = fig.add_subplot(gs[1, 0])
+ax_tongue = fig.add_subplot(gs[1, 1])
+
+# ── Top panel: time series of Δθ(t) for several Δω ──
+
+Dw_values = [0.2, 0.6, 0.9, 1.05, 1.15, 1.19]
+T_end_csd = 150.0
+t_eval_csd = np.linspace(0, T_end_csd, 8000)
+colors_csd = plt.cm.viridis(np.linspace(0.1, 0.9, len(Dw_values)))
+
+# Start with a perturbation away from the fixed point
+theta0_csd = [np.pi / 3, 0.0]  # initial phase difference ≈ π/3
+
+for i, Dw in enumerate(Dw_values):
+    omega1_csd = 1.0
+    omega2_csd = 1.0 - Dw  # so Δω = ω₁ − ω₂ = Dw
+
+    def rhs_csd(t, theta, K=K_fixed, w1=omega1_csd, w2=omega2_csd):
+        th1, th2 = theta
+        return [w1 + K * np.sin(th2 - th1),
+                w2 + K * np.sin(th1 - th2)]
+
+    sol = solve_ivp(rhs_csd, [0, T_end_csd], theta0_csd,
+                    t_eval=t_eval_csd, rtol=1e-10, atol=1e-12)
+    delta_theta = sol.y[0] - sol.y[1]
+
+    # Compute the expected equilibrium
+    ratio = Dw / (2 * K_fixed)
+    if abs(ratio) <= 1:
+        eq_val = np.arcsin(ratio)
+    else:
+        eq_val = None
+
+    label = rf"$\Delta\omega = {Dw}$"
+    if abs(Dw - 1.19) < 0.01:
+        label += r"  ($\approx \Delta\omega_c$)"
+
+    ax_ts.plot(sol.t, delta_theta, color=colors_csd[i], lw=1.3, label=label)
+
+ax_ts.set_xlabel("t", fontsize=12)
+ax_ts.set_ylabel(r"$\Delta\theta(t)$", fontsize=12)
+ax_ts.set_title(
+    f"Critical Slowing Down — Phase Relaxation (K = {K_fixed})\n"
+    rf"$\Delta\omega_c = 2K = {Dw_critical}$: "
+    "relaxation time diverges as the locking boundary is approached",
+    fontsize=13)
+ax_ts.legend(fontsize=9, loc="upper right")
+ax_ts.grid(True, alpha=0.2)
+
+# ── Bottom-left: relaxation time vs Δω ──
+
+# Theoretical: near the saddle-node, linearized decay rate is
+# γ = sqrt((2K)² − Δω²), so τ = 1/γ = 1/sqrt(4K² − Δω²)
+Dw_sweep = np.linspace(0.0, Dw_critical - 0.001, 1000)
+gamma_theory = np.sqrt((2 * K_fixed)**2 - Dw_sweep**2)
+tau_theory = 1.0 / gamma_theory
+
+# Numerical: measure time for |Δθ(t) - Δθ*| to drop below threshold
+Dw_num = np.linspace(0.05, Dw_critical - 0.01, 80)
+tau_num = np.empty(len(Dw_num))
+threshold = 0.01
+
+for i, Dw in enumerate(Dw_num):
+    omega2_n = 1.0 - Dw
+    ratio = Dw / (2 * K_fixed)
+    eq_val = np.arcsin(np.clip(ratio, -1, 1))
+
+    def rhs_n(t, theta, K=K_fixed, w2=omega2_n):
+        th1, th2 = theta
+        return [1.0 + K * np.sin(th2 - th1),
+                w2 + K * np.sin(th1 - th2)]
+
+    sol = solve_ivp(rhs_n, [0, 500.0], theta0_csd,
+                    t_eval=np.linspace(0, 500.0, 20000),
+                    rtol=1e-10, atol=1e-12)
+    delta_theta_n = sol.y[0] - sol.y[1]
+    # Find first time |Δθ − eq| < threshold
+    err = np.abs(delta_theta_n - eq_val)
+    locked_idx = np.where(err < threshold)[0]
+    if len(locked_idx) > 0:
+        tau_num[i] = sol.t[locked_idx[0]]
+    else:
+        tau_num[i] = 500.0  # didn't converge
+
+ax_tau.plot(Dw_sweep, tau_theory, "C3-", lw=1.5,
+            label=r"Theory: $\tau = 1/\sqrt{4K^2 - \Delta\omega^2}$")
+ax_tau.plot(Dw_num, tau_num, "ko", ms=3, alpha=0.7,
+            label="Numerical (time to converge)")
+ax_tau.axvline(Dw_critical, color="gray", ls="--", lw=1.0, alpha=0.7)
+ax_tau.annotate(rf"$\Delta\omega_c = {Dw_critical}$",
+                xy=(Dw_critical, 0.9), xycoords=("data", "axes fraction"),
+                fontsize=10, ha="right", color="gray")
+ax_tau.set_xlabel(r"$\Delta\omega$", fontsize=12)
+ax_tau.set_ylabel(r"Relaxation time $\tau$", fontsize=12)
+ax_tau.set_title("Relaxation Time Divergence", fontsize=12)
+ax_tau.set_ylim(0, 60)
+ax_tau.legend(fontsize=9)
+ax_tau.grid(True, alpha=0.2)
+
+# ── Bottom-right: Arnold tongue with path marked ──
+
+dw_range_t = np.linspace(-2.0, 2.0, 400)
+K_range_t = np.linspace(0.0, 1.5, 300)
+DW_t, KK_t = np.meshgrid(dw_range_t, K_range_t)
+locked_t = KK_t >= np.abs(DW_t) / 2.0
+
+ax_tongue.contourf(DW_t, KK_t, locked_t.astype(float), levels=[0.5, 1.5],
+                    colors=["#4C72B0"], alpha=0.3)
+ax_tongue.contour(DW_t, KK_t, locked_t.astype(float), levels=[0.5],
+                  colors=["#4C72B0"], linewidths=1.5)
+
+# Theoretical boundary
+dw_pos_t = np.linspace(0, 2.0, 200)
+ax_tongue.plot(dw_pos_t, dw_pos_t / 2, "k--", lw=1.0)
+ax_tongue.plot(-dw_pos_t, dw_pos_t / 2, "k--", lw=1.0)
+
+# Draw the path: horizontal line at K = 0.6, Δω from 0 to 1.2
+ax_tongue.axhline(K_fixed, color="C3", lw=2.0, ls="-", alpha=0.5)
+ax_tongue.annotate("", xy=(Dw_critical, K_fixed),
+                   xytext=(0.0, K_fixed),
+                   arrowprops=dict(arrowstyle="-|>", color="C3", lw=2.0))
+
+# Mark the sampled Δω values
+for Dw in Dw_values:
+    ax_tongue.plot(Dw, K_fixed, "o", color="C3", ms=5, mec="black",
+                   mew=0.5, zorder=5)
+
+# Mark critical point
+ax_tongue.plot(Dw_critical, K_fixed, "*", color="gold", ms=14,
+               mec="black", mew=1.0, zorder=6)
+ax_tongue.annotate(rf"$\Delta\omega_c = {Dw_critical}$",
+                   xy=(Dw_critical, K_fixed),
+                   xytext=(Dw_critical + 0.15, K_fixed + 0.15),
+                   fontsize=10, ha="left",
+                   arrowprops=dict(arrowstyle="->", color="black", lw=1.0))
+
+ax_tongue.set_xlabel(r"$\Delta\omega$", fontsize=12)
+ax_tongue.set_ylabel("K", fontsize=12)
+ax_tongue.set_title(f"Path through Arnold tongue (K = {K_fixed})", fontsize=12)
+ax_tongue.set_xlim(-1.5, 2.0)
+ax_tongue.set_ylim(0, 1.2)
+ax_tongue.grid(True, alpha=0.2)
+
+plt.savefig("coupled_critical_slowing.png", dpi=150)
+print("Saved coupled_critical_slowing.png")
+
 plt.show()
 
 print("\n=== Coupled Oscillators Summary ===")
