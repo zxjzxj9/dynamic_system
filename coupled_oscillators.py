@@ -490,6 +490,121 @@ ax_tongue.grid(True, alpha=0.2)
 plt.savefig("coupled_critical_slowing.png", dpi=150)
 print("Saved coupled_critical_slowing.png")
 
+
+# ══════════════════════════════════════════════════════════════════
+# Figure 6: Beat Frequency vs Δω
+# ══════════════════════════════════════════════════════════════════
+
+print("Computing beat frequency vs Δω...")
+
+K_beat_values = [0.2, 0.4, 0.6]
+Dw_range_beat = np.linspace(0.0, 2.5, 2000)
+
+fig, (ax_beat, ax_ts_beat) = plt.subplots(2, 1, figsize=(12, 10),
+                                           gridspec_kw={"height_ratios": [1, 1]})
+
+# ── Top panel: Ω_beat vs Δω ──
+
+for K_b in K_beat_values:
+    Dw_c = 2 * K_b
+
+    # Theory: Ω_beat = sqrt(Δω² - 4K²) for |Δω| > 2K, else 0
+    Omega_beat_theory = np.where(
+        Dw_range_beat > Dw_c,
+        np.sqrt(Dw_range_beat**2 - (2 * K_b)**2),
+        0.0)
+
+    ax_beat.plot(Dw_range_beat, Omega_beat_theory, lw=2.0,
+                 label=rf"K = {K_b}  ($\Delta\omega_c = {Dw_c}$)")
+
+    # Mark the critical point
+    ax_beat.plot(Dw_c, 0, "o", color="black", ms=6, zorder=5)
+
+    # Numerical verification: measure beat frequency from time series
+    Dw_num_beat = np.linspace(Dw_c + 0.05, 2.5, 30)
+    Omega_beat_num = np.empty(len(Dw_num_beat))
+
+    for i, Dw in enumerate(Dw_num_beat):
+        w2_b = 1.0 - Dw
+
+        def rhs_beat(t, theta, K=K_b, w2=w2_b):
+            th1, th2 = theta
+            return [1.0 + K * np.sin(th2 - th1),
+                    w2 + K * np.sin(th1 - th2)]
+
+        T_b = 500.0
+        sol = solve_ivp(rhs_beat, [0, T_b], [0.0, 0.0],
+                        t_eval=[T_b / 2, T_b],
+                        rtol=1e-10, atol=1e-12)
+        dt_b = sol.t[-1] - sol.t[0]
+        # Beat freq = |ω₁_eff - ω₂_eff|
+        w1_eff = (sol.y[0, -1] - sol.y[0, 0]) / dt_b
+        w2_eff = (sol.y[1, -1] - sol.y[1, 0]) / dt_b
+        Omega_beat_num[i] = abs(w1_eff - w2_eff)
+
+    ax_beat.scatter(Dw_num_beat, Omega_beat_num, s=12, color="black",
+                    alpha=0.4, zorder=4,
+                    label="Numerical" if K_b == K_beat_values[0] else None)
+
+# Reference line: Ω_beat = Δω (uncoupled limit)
+ax_beat.plot(Dw_range_beat, Dw_range_beat, "k:", lw=1.0, alpha=0.4,
+             label=r"$\Omega_{\rm beat} = \Delta\omega$ (K = 0)")
+
+ax_beat.set_xlabel(r"Frequency detuning $|\Delta\omega|$", fontsize=12)
+ax_beat.set_ylabel(r"Beat frequency $\Omega_{\rm beat}$", fontsize=12)
+ax_beat.set_title(
+    "Beat Frequency vs Frequency Detuning\n"
+    r"$\Omega_{\rm beat} = \sqrt{\Delta\omega^2 - 4K^2}$"
+    r"  for $|\Delta\omega| > 2K$,  else 0 (locked)",
+    fontsize=13)
+ax_beat.legend(fontsize=9)
+ax_beat.set_xlim(0, 2.5)
+ax_beat.set_ylim(-0.05, 2.5)
+ax_beat.grid(True, alpha=0.2)
+
+# Shade the locked region for K=0.6
+ax_beat.axvspan(0, 2 * 0.6, color="C2", alpha=0.08)
+ax_beat.annotate("Locked\n(K = 0.6)", xy=(0.5, 1.5), fontsize=10,
+                 color="C2", ha="center", alpha=0.7)
+
+# ── Bottom panel: example time series showing beating ──
+
+K_ex = 0.6
+Dw_ex_values = [0.5, 1.0, 1.25, 1.8]
+T_ts = 80.0
+t_ts = np.linspace(0, T_ts, 5000)
+colors_ts = plt.cm.cool(np.linspace(0.2, 0.8, len(Dw_ex_values)))
+
+for i, Dw in enumerate(Dw_ex_values):
+    w2_ex = 1.0 - Dw
+
+    def rhs_ex(t, theta, K=K_ex, w2=w2_ex):
+        th1, th2 = theta
+        return [1.0 + K * np.sin(th2 - th1),
+                w2 + K * np.sin(th1 - th2)]
+
+    sol = solve_ivp(rhs_ex, [0, T_ts], [0.0, 0.0],
+                    t_eval=t_ts, rtol=1e-10, atol=1e-12)
+    delta_theta = sol.y[0] - sol.y[1]
+    # Plot sin(Δθ) to show the beating visually
+    beat_signal = np.sin(delta_theta)
+
+    status = "locked" if Dw <= 2 * K_ex else "beating"
+    ax_ts_beat.plot(sol.t, beat_signal, color=colors_ts[i], lw=1.0,
+                    label=rf"$\Delta\omega = {Dw}$ ({status})")
+
+ax_ts_beat.set_xlabel("t", fontsize=12)
+ax_ts_beat.set_ylabel(r"$\sin(\Delta\theta)$", fontsize=12)
+ax_ts_beat.set_title(
+    f"Beat Signal sin(Δθ) — Locked vs Beating (K = {K_ex})",
+    fontsize=12)
+ax_ts_beat.legend(fontsize=9, loc="upper right")
+ax_ts_beat.grid(True, alpha=0.2)
+
+plt.tight_layout()
+plt.savefig("coupled_beat_frequency.png", dpi=150)
+print("Saved coupled_beat_frequency.png")
+
 plt.show()
 
 print("\n=== Coupled Oscillators Summary ===")

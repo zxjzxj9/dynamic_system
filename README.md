@@ -415,6 +415,19 @@ At fixed coupling K = 0.6, increasing the frequency detuning Δω toward the cri
 
 Critical slowing down is not just a mathematical curiosity — it serves as an **early warning signal** for tipping points in climate systems, ecosystems, financial markets, and neural networks. The increasing relaxation time can be detected in data before the actual transition occurs.
 
+### Beat Frequency
+
+![Beat Frequency](coupled_beat_frequency.png)
+
+Outside the locking region (|Δω| > 2K), the oscillators are unlocked and their phase difference drifts, producing a **beat signal** — a periodic oscillation of sin(Δθ) at the beat frequency:
+
+$$\Omega_{\rm beat} = \sqrt{\Delta\omega^2 - 4K^2}$$
+
+- **Top panel**: beat frequency vs detuning for K = 0.2, 0.4, 0.6. Inside the locked region (green shading for K = 0.6), Ω_beat = 0. Outside, it grows with a characteristic square-root onset. The dotted line shows the uncoupled case (K = 0, Ω_beat = Δω). Coupling suppresses the beat frequency — the oscillators "resist" being detuned even when they can't fully lock.
+- **Bottom panel**: the actual beat signal sin(Δθ) at K = 0.6. Locked orbits (Δω = 0.5, 1.0) settle to a constant. Just beyond the critical detuning (Δω = 1.25), beating is very slow — the signature of critical slowing down seen from the unlocked side. At larger detuning (Δω = 1.8), beating is fast and approaches the uncoupled rate.
+
+The square-root vanishing of the beat frequency is the dual of the relaxation time divergence — both are consequences of the saddle-node bifurcation at Δω = 2K, viewed from opposite sides of the transition.
+
 ---
 
 ## Sine-Circle Map — Arnold Tongues and the Devil's Staircase
