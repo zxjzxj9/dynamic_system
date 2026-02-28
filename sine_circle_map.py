@@ -135,6 +135,139 @@ plt.tight_layout()
 plt.savefig("sine_circle_tongues.png", dpi=150)
 print("Saved sine_circle_tongues.png")
 
+
+# ══════════════════════════════════════════════════════════════════
+# Figure 3: Bifurcation Diagram — Route to Chaos (sweep K)
+# ══════════════════════════════════════════════════════════════════
+
+print("Computing bifurcation diagram (sweeping K)...")
+
+# Use two Ω values to show different routes to chaos
+Omega_bif_values = [
+    (0.0,   r"$\Omega = 0$  (period-1 tongue)"),
+    (1/3,   r"$\Omega = 1/3$  (period-3 tongue)"),
+]
+
+fig, axes = plt.subplots(len(Omega_bif_values), 1, figsize=(14, 12),
+                          sharex=True)
+
+n_K_bif = 4000
+K_bif = np.linspace(0.0, 4.0, n_K_bif)
+n_transient_bif = 2000
+n_record_bif = 200
+
+for idx, (Omega_bif, label) in enumerate(Omega_bif_values):
+    ax = axes[idx]
+    print(f"  {label}...")
+
+    K_list = []
+    theta_list = []
+
+    for K in K_bif:
+        theta = 0.1
+        # Transient
+        for _ in range(n_transient_bif):
+            theta = (theta + Omega_bif
+                     - K / (2 * np.pi) * np.sin(2 * np.pi * theta)) % 1.0
+        # Record
+        for _ in range(n_record_bif):
+            theta = (theta + Omega_bif
+                     - K / (2 * np.pi) * np.sin(2 * np.pi * theta)) % 1.0
+            K_list.append(K)
+            theta_list.append(theta)
+
+    K_all = np.array(K_list)
+    theta_all = np.array(theta_list)
+
+    ax.scatter(K_all, theta_all, s=0.01, c="black", alpha=0.15,
+               edgecolors="none")
+    ax.axvline(1.0, color="crimson", lw=1.0, ls="--", alpha=0.7)
+    ax.annotate("K = 1\n(critical)", xy=(1.0, 0.97),
+                xycoords=("data", "axes fraction"),
+                fontsize=9, color="crimson", ha="center", va="top",
+                bbox=dict(boxstyle="round,pad=0.2", fc="white", alpha=0.85))
+    ax.set_ylabel(r"$\theta^*$", fontsize=12)
+    ax.set_title(label, fontsize=12)
+    ax.set_ylim(0, 1)
+    ax.grid(True, alpha=0.2)
+
+axes[-1].set_xlabel("Coupling strength K", fontsize=12)
+axes[-1].set_xlim(0, 4.0)
+
+fig.suptitle(
+    "Sine-Circle Map — Bifurcation Diagram (Route to Chaos)\n"
+    r"$\theta_{n+1} = \theta_n + \Omega - \frac{K}{2\pi}"
+    r"\sin(2\pi\theta_n)\ (\mathrm{mod}\ 1)$",
+    fontsize=13)
+
+plt.tight_layout()
+plt.savefig("sine_circle_bifurcation.png", dpi=150)
+print("Saved sine_circle_bifurcation.png")
+
+
+# ══════════════════════════════════════════════════════════════════
+# Figure 4: Lyapunov Exponent vs K
+# ══════════════════════════════════════════════════════════════════
+
+print("Computing Lyapunov exponent vs K...")
+
+n_K_lyap = 2000
+K_lyap = np.linspace(0.0, 4.0, n_K_lyap)
+n_transient_lyap = 2000
+n_lyap_iter = 5000
+
+fig, axes = plt.subplots(len(Omega_bif_values), 1, figsize=(14, 10),
+                          sharex=True)
+
+for idx, (Omega_bif, label) in enumerate(Omega_bif_values):
+    ax = axes[idx]
+    print(f"  {label}...")
+
+    lyap = np.empty(n_K_lyap)
+
+    for i, K in enumerate(K_lyap):
+        theta = 0.1
+        # Transient
+        for _ in range(n_transient_lyap):
+            theta = (theta + Omega_bif
+                     - K / (2 * np.pi) * np.sin(2 * np.pi * theta)) % 1.0
+        # Lyapunov sum
+        log_sum = 0.0
+        for _ in range(n_lyap_iter):
+            # Derivative of map: d(theta_new)/d(theta) = 1 - K cos(2π θ)
+            deriv = abs(1.0 - K * np.cos(2 * np.pi * theta))
+            if deriv > 0:
+                log_sum += np.log(deriv)
+            else:
+                log_sum += -50  # effectively -inf
+            theta = (theta + Omega_bif
+                     - K / (2 * np.pi) * np.sin(2 * np.pi * theta)) % 1.0
+        lyap[i] = log_sum / n_lyap_iter
+
+    ax.plot(K_lyap, lyap, "k-", lw=0.5)
+    ax.axhline(0, color="crimson", lw=1.0, ls="-", alpha=0.5)
+    ax.axvline(1.0, color="gray", lw=1.0, ls="--", alpha=0.5)
+    ax.fill_between(K_lyap, lyap, 0, where=(lyap > 0),
+                    color="C3", alpha=0.3, label=r"$\lambda > 0$ (chaotic)")
+    ax.fill_between(K_lyap, lyap, 0, where=(lyap < 0),
+                    color="C0", alpha=0.15, label=r"$\lambda < 0$ (stable)")
+    ax.set_ylabel(r"Lyapunov exponent $\lambda$", fontsize=11)
+    ax.set_title(label, fontsize=12)
+    ax.legend(fontsize=9, loc="upper left")
+    ax.grid(True, alpha=0.2)
+
+axes[-1].set_xlabel("Coupling strength K", fontsize=12)
+axes[-1].set_xlim(0, 4.0)
+
+fig.suptitle(
+    "Sine-Circle Map — Lyapunov Exponent vs Coupling\n"
+    r"$\lambda > 0$: sensitive dependence on initial conditions (chaos)",
+    fontsize=13)
+
+plt.tight_layout()
+plt.savefig("sine_circle_lyapunov.png", dpi=150)
+print("Saved sine_circle_lyapunov.png")
+
 plt.show()
 
 print("\n=== Sine-Circle Map Summary ===")

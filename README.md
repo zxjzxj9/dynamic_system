@@ -437,6 +437,29 @@ The Arnold tongue diagram maps the winding number W(Ω, K) across the full param
 
 The largest tongues correspond to the simplest rationals (1/2, 1/3, 2/3), while thinner tongues at higher-order rationals (2/5, 3/7, ...) nest between them in a Farey-tree hierarchy. This structure is universal — it appears in any nonlinear oscillator driven by a periodic force.
 
+### Bifurcation Diagram — Route to Chaos
+
+![Bifurcation Diagram](sine_circle_bifurcation.png)
+
+Sweeping K at fixed Ω reveals how the locked orbit destabilizes as coupling increases past the critical line K = 1:
+
+- **Ω = 0 (period-1 tongue)**: a single fixed point persists until K ≈ 2π, where it undergoes a period-doubling cascade leading to chaos. Periodic windows (narrow bands of stable orbits) interrupt the chaotic regime at higher K.
+- **Ω = 1/3 (period-3 tongue)**: the period-3 orbit similarly destabilizes beyond K = 1, with richer bifurcation structure including period-doubling and intermittent chaotic bands.
+
+In both cases, the onset of chaos coincides with the map becoming non-invertible (K > 1), where the derivative 1 − K cos(2πθ) can change sign — creating folds in the map that generate stretching and folding of phase space.
+
+### Lyapunov Exponent
+
+![Lyapunov Exponent](sine_circle_lyapunov.png)
+
+The Lyapunov exponent λ quantifies the rate of exponential divergence of nearby orbits:
+
+- **λ < 0** (blue): orbits converge — the system is mode-locked on a stable periodic orbit. Deep dips at the critical line (K = 1) correspond to superstable cycles.
+- **λ = 0**: the boundary — quasiperiodic motion (K < 1) or marginal stability.
+- **λ > 0** (red): chaos — nearby orbits separate exponentially. Appears predominantly for K > 1, with the fraction of chaotic K values growing as coupling increases.
+
+The interleaving of chaotic (λ > 0) and stable (λ < 0) windows is characteristic of the **period-doubling route to chaos** and mirrors the structure seen in the bifurcation diagram above.
+
 ## Dependencies
 
 - sympy
