@@ -559,6 +559,47 @@ Six snapshots of the diffusion process on G(50, 0.1), with node color showing u_
 
 The spatial pattern of the diffusion front reflects the graph's topology: heat reaches well-connected hubs first and reaches peripheral nodes last. The Fiedler vector v₂ predicts which nodes equilibrate last — those on the opposite side of the spectral partition from the source.
 
+---
+
+## FitzHugh–Nagumo Model — Excitability and Relaxation Oscillations
+
+$$\dot{v} = v - v^3/3 - w + I, \quad \dot{w} = \varepsilon(v + a - bw)$$
+
+A simplified 2D model of neuronal excitability. The fast variable v represents membrane potential; the slow variable w represents recovery. External current I controls the regime: excitable (resting neuron) → oscillatory (firing neuron) → excitable (depolarization block).
+
+```bash
+python fitzhugh_nagumo.py
+```
+
+### Phase Portraits
+
+![Phase Portraits](fhn_phase_portraits.png)
+
+Four panels showing how the dynamics change as external current I increases (a=0.7, b=0.8, ε=0.08):
+
+- **I = 0 (excitable)**: a stable spiral sits on the left branch of the cubic nullcline. Small perturbations return to rest; large perturbations trigger a single spike (the gold trajectory shows a threshold excursion).
+- **I = 0.34 (near Hopf)**: the equilibrium has just lost stability (unstable spiral) and a limit cycle emerges — the neuron begins to fire.
+- **I = 0.5 (oscillatory)**: a stable limit cycle produces sustained periodic spiking. The trajectory follows the cubic nullcline's branches (fast jumps) connected by slow segments — classic **relaxation oscillations**.
+- **I = 1.0 (large oscillations)**: the limit cycle grows, with the fast variable v making large excursions between the two branches of the cubic.
+
+### Time Series
+
+![Time Series](fhn_time_series.png)
+
+- **Top row (excitable, I = 0)**: a brief current pulse (gold bar) kicks the system past threshold → a single spike in v (fast upstroke, slow recovery), then return to rest. The phase portrait shows the characteristic loop around the cubic nullcline.
+- **Bottom row (oscillatory, I = 0.5)**: sustained periodic spiking with no external stimulus. The slow variable w lags behind v, creating the saw-tooth pattern typical of relaxation oscillators. The phase portrait shows the stable limit cycle.
+
+### Bifurcation Diagram
+
+![Bifurcation](fhn_bifurcation.png)
+
+Sweeping I reveals the full bifurcation structure:
+
+- **I < 0.33**: stable equilibrium (blue) — the neuron is at rest.
+- **I ≈ 0.33**: **Hopf bifurcation** — the equilibrium loses stability and a limit cycle is born. The green envelope shows the min/max of v on the limit cycle.
+- **0.33 < I < 1.42**: oscillatory regime — sustained spiking with amplitude that varies with I.
+- **I ≈ 1.42**: **second Hopf bifurcation** — the limit cycle disappears and the equilibrium regains stability. This corresponds to **depolarization block** — too much current overwhelms the neuron's ability to fire.
+
 ## Dependencies
 
 - sympy
