@@ -58,6 +58,24 @@ python lotka_volterra.py
 - **Gray contours**: level curves of the conserved quantity `H(x,y) = δx − γ ln x + βy − α ln y`, confirming that orbits are closed.
 - **Gold trajectories**: sample orbits showing the counter-clockwise cycling — prey peak is followed by predator peak with a phase lag.
 
+### Allee Effect — Extinction Threshold
+
+$$\dot{x} = x(\alpha - \beta y)(x/\theta - 1), \quad \dot{y} = -y(\gamma - \delta x)$$
+
+Adding the factor (x/θ − 1) introduces a **strong Allee effect**: prey must exceed the threshold θ to grow. Below θ, the growth term flips sign and prey decline even without predators — modeling extinction risk from underpopulation (e.g., difficulty finding mates, loss of herd protection).
+
+![Allee Effect](lotka_volterra_allee.png)
+
+Three panels with increasing threshold θ = 0.15, 0.4, 0.7 (same α, β, δ, γ as the classic model):
+
+- **New fixed point at (θ, 0)**: a saddle point on the x-axis. Its stable manifold forms the **separatrix** — the boundary between survival and extinction basins.
+- **Red-shaded region (x < θ)**: the extinction basin. Trajectories starting here (red curves) are pulled toward the origin — both species go extinct.
+- **Green trajectories (x > θ)**: orbits that survive, cycling around the coexistence equilibrium at (γ/δ, α/β) = (0.8, 0.667).
+- **Vertical nullcline at x = θ** (green dashed): the Allee threshold appears as a new nullcline, creating a barrier in phase space.
+- **θ = 0.7 (rightmost panel)**: the threshold is close to the equilibrium (x* = 0.8), leaving a very narrow coexistence region. Even small perturbations can push the system across the separatrix into extinction — the population is **fragile**.
+
+The Allee effect transforms the structurally stable center of the classic Lotka-Volterra into a system with **bistability**: coexistence and extinction are both possible, separated by a critical boundary in phase space.
+
 ## Van der Pol Oscillator Example
 
 A nonlinear oscillator with self-sustaining oscillations:
