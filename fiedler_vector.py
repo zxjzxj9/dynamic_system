@@ -223,6 +223,152 @@ plt.tight_layout()
 plt.savefig("fiedler_spectrum.png", dpi=150)
 print("Saved fiedler_spectrum.png")
 
+
+# ══════════════════════════════════════════════════════════════════
+# Figure 4: Diffusion from a single node under different p
+# ══════════════════════════════════════════════════════════════════
+
+print("Computing diffusion from a single node...")
+
+from scipy.linalg import expm
+
+n_diff = 50
+source_node = 0  # pick node 0 as source
+t_max = 5.0
+t_vals = np.linspace(0, t_max, 500)
+
+p_values = [0.05, 0.10, 0.15, 0.25, 0.40]
+
+fig, (ax_source, ax_avg) = plt.subplots(2, 1, figsize=(12, 10), sharex=True)
+
+for p_d in p_values:
+    rng_d = np.random.RandomState(42)
+    # Generate connected graph
+    for _ in range(200):
+        G_d = nx.erdos_renyi_graph(n_diff, p_d, seed=rng_d)
+        if nx.is_connected(G_d):
+            break
+
+    L_d = nx.laplacian_matrix(G_d).toarray().astype(float)
+    evals_d = np.linalg.eigvalsh(L_d)
+    lambda2_d = evals_d[1]
+
+    # Initial condition: u(0) = δ_source (1 at source, 0 elsewhere)
+    u0 = np.zeros(n_diff)
+    u0[source_node] = 1.0
+
+    # Eigendecomposition for efficient exp(-Lt)
+    evals_full, evecs_full = np.linalg.eigh(L_d)
+    # u(t) = V exp(-Λt) V^T u0
+    coeffs = evecs_full.T @ u0  # projection onto eigenbasis
+
+    u_source = np.empty(len(t_vals))
+    u_max = np.empty(len(t_vals))
+    u_equil = 1.0 / n_diff  # equilibrium value
+
+    for i, t in enumerate(t_vals):
+        u_t = evecs_full @ (coeffs * np.exp(-evals_full * t))
+        u_source[i] = u_t[source_node]
+        u_max[i] = np.max(u_t)
+
+    label = (rf"p = {p_d}  ($\lambda_2 = {lambda2_d:.3f}$, "
+             f"{G_d.number_of_edges()} edges)")
+    ax_source.plot(t_vals, u_source, lw=1.8, label=label)
+    ax_avg.plot(t_vals, u_max, lw=1.8, label=label)
+
+    print(f"  p = {p_d}: λ₂ = {lambda2_d:.4f}, edges = {G_d.number_of_edges()}")
+
+# Equilibrium line
+ax_source.axhline(1.0 / n_diff, color="black", ls=":", lw=1.0, alpha=0.5)
+ax_source.annotate(f"Equilibrium = 1/n = {1/n_diff:.3f}",
+                   xy=(t_max * 0.7, 1.0 / n_diff + 0.005),
+                   fontsize=9, color="black", alpha=0.7)
+ax_avg.axhline(1.0 / n_diff, color="black", ls=":", lw=1.0, alpha=0.5)
+
+ax_source.set_ylabel(r"$u_{\rm source}(t)$", fontsize=12)
+ax_source.set_title(
+    "Heat Diffusion from a Single Node on ER Graphs\n"
+    r"$du/dt = -Lu$, initial condition: $u(0) = \delta_{\rm source}$",
+    fontsize=13)
+ax_source.set_yscale("log")
+ax_source.set_ylim(1.0 / n_diff * 0.5, 1.2)
+ax_source.legend(fontsize=9)
+ax_source.grid(True, alpha=0.2)
+
+ax_avg.set_xlabel("Time t", fontsize=12)
+ax_avg.set_ylabel(r"$\max_i\, u_i(t)$", fontsize=12)
+ax_avg.set_title(
+    "Maximum node value — convergence to equilibrium\n"
+    r"Decay rate governed by $\lambda_2$: larger $\lambda_2$ → faster mixing",
+    fontsize=12)
+ax_avg.set_yscale("log")
+ax_avg.set_ylim(1.0 / n_diff * 0.5, 1.2)
+ax_avg.legend(fontsize=9)
+ax_avg.grid(True, alpha=0.2)
+
+plt.tight_layout()
+plt.savefig("fiedler_diffusion.png", dpi=150)
+print("Saved fiedler_diffusion.png")
+
+
+# ══════════════════════════════════════════════════════════════════
+# Figure 5: Snapshots of diffusion on the graph
+# ══════════════════════════════════════════════════════════════════
+
+print("Drawing diffusion snapshots on graph...")
+
+# Use the main graph G (p=0.1)
+L_main = nx.laplacian_matrix(G).toarray().astype(float)
+evals_main, evecs_main = np.linalg.eigh(L_main)
+
+u0_snap = np.zeros(n)
+u0_snap[source_node] = 1.0
+coeffs_snap = evecs_main.T @ u0_snap
+
+snapshot_times = [0.0, 0.1, 0.3, 0.5, 1.0, 3.0]
+
+fig, axes = plt.subplots(2, 3, figsize=(18, 12))
+axes = axes.ravel()
+
+sm_diff = plt.cm.ScalarMappable(
+    cmap="hot_r",
+    norm=mcolors.LogNorm(vmin=1e-3, vmax=1.0))
+sm_diff.set_array([])
+
+for idx, t_snap in enumerate(snapshot_times):
+    ax = axes[idx]
+    u_snap = evecs_main @ (coeffs_snap * np.exp(-evals_main * t_snap))
+    u_snap = np.clip(u_snap, 1e-4, None)  # clip for log colormap
+
+    node_rgba_snap = plt.cm.hot_r(
+        mcolors.LogNorm(vmin=1e-3, vmax=1.0)(u_snap))
+
+    nx.draw_networkx_edges(G, pos, ax=ax, alpha=0.2, width=0.6,
+                           edge_color="gray")
+    nx.draw_networkx_nodes(G, pos, ax=ax, node_color=node_rgba_snap,
+                           node_size=150, edgecolors="black", linewidths=0.4)
+    # Highlight source
+    ax.scatter(*pos[source_node], s=250, facecolors="none",
+               edgecolors="lime", linewidths=2.0, zorder=10)
+
+    ax.set_title(f"t = {t_snap}", fontsize=12)
+    ax.axis("off")
+
+fig.suptitle(
+    f"Diffusion Snapshots on G({n}, {p})\n"
+    r"$du/dt = -Lu$, source node circled in green"
+    f"  ($\\lambda_2 = {lambda2:.4f}$)",
+    fontsize=13)
+
+# Shared colorbar
+cbar_ax = fig.add_axes([0.92, 0.15, 0.015, 0.7])
+cbar = fig.colorbar(sm_diff, cax=cbar_ax)
+cbar.set_label(r"$u_i(t)$  (log scale)", fontsize=11)
+
+plt.tight_layout(rect=[0, 0, 0.91, 0.95])
+plt.savefig("fiedler_diffusion_snapshots.png", dpi=150)
+print("Saved fiedler_diffusion_snapshots.png")
+
 plt.show()
 
 print("\n=== Fiedler Vector Summary ===")

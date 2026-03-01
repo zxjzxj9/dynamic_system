@@ -519,6 +519,28 @@ The full Laplacian eigenvalue spectrum for two ER graphs at different connection
 
 The Fiedler value has a direct physical interpretation: if we model heat diffusion on the graph (du/dt = −Lu), then λ₂ is the **slowest non-trivial decay rate** — it governs how quickly the network reaches thermal equilibrium. A small λ₂ means slow mixing; a large λ₂ means fast equilibration. This connects spectral graph theory to synchronization: on a network of coupled oscillators, λ₂ determines the critical coupling for global synchronization.
 
+### Heat Diffusion from a Single Node
+
+![Diffusion Decay](fiedler_diffusion.png)
+
+Heat diffusion on a graph follows du/dt = −Lu. Starting from u(0) = δ_source (all heat concentrated at one node), the value decays as the heat spreads across the network. The decay rate is directly governed by the Laplacian eigenvalues:
+
+- **Top panel**: the source node's value u_source(t) on a log scale for p = 0.05, 0.1, 0.15, 0.25, 0.4. Denser graphs (larger p, larger λ₂) decay much faster — the heat dissipates quickly through many connections. The sparse graph (p = 0.05, λ₂ = 0.09) retains its heat far longer, reflecting its bottleneck structure.
+- **Bottom panel**: the maximum node value max_i u_i(t), tracking convergence to the equilibrium value 1/n. All curves eventually reach the uniform distribution, but the timescale varies by orders of magnitude.
+
+### Diffusion Snapshots
+
+![Diffusion Snapshots](fiedler_diffusion_snapshots.png)
+
+Six snapshots of the diffusion process on G(50, 0.1), with node color showing u_i(t) on a log scale (dark red = high, white = low). The source node is circled in green:
+
+- **t = 0**: all heat at the source node.
+- **t = 0.1–0.3**: heat spreads to immediate neighbors, then to neighbors-of-neighbors.
+- **t = 0.5–1.0**: the heat front reaches the far side of the graph, but a gradient remains — nodes far from the source are still cooler.
+- **t = 3.0**: near equilibrium — all nodes have approximately equal values (uniform orange).
+
+The spatial pattern of the diffusion front reflects the graph's topology: heat reaches well-connected hubs first and reaches peripheral nodes last. The Fiedler vector v₂ predicts which nodes equilibrate last — those on the opposite side of the spectral partition from the source.
+
 ## Dependencies
 
 - sympy
