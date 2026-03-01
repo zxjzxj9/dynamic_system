@@ -5,10 +5,10 @@ Lotka–Volterra Predator-Prey Phase Portrait
     dx/dt = αx  - βxy   =  x(α - βy)     (prey)
     dy/dt = δxy - γy     =  y(δx - γ)     (predator)
 
-Parameters used:  α = 1, β = 0.5, δ = 0.25, γ = 0.5
+Parameters used:  α = 1, β = 1.5, δ = 1.25, γ = 1
 Equilibria:
-    (0, 0)            — saddle
-    (γ/δ, α/β) = (2, 2) — center  (conserved quantity → closed orbits)
+    (0, 0)              — saddle
+    (γ/δ, α/β) = (0.8, 0.667) — center  (conserved quantity → closed orbits)
 """
 
 import sympy as sp
@@ -21,7 +21,7 @@ from phase_portrait import (find_equilibria, classify_equilibrium)
 
 
 # ── Parameters ──
-alpha, beta, delta, gamma_ = 1.0, 0.5, 0.25, 0.5
+alpha, beta, delta, gamma_ = 1.0, 1.5, 1.25, 1.0
 
 x, y = sp.symbols("x y")
 f_expr = alpha * x - beta * x * y      # prey  dx/dt
@@ -44,7 +44,7 @@ def H(xv, yv):
                 + beta * yv - alpha * np.log(yv))
 
 # ── Plot ──
-xlim, ylim = (0.05, 6), (0.05, 6)
+xlim, ylim = (0.05, 4), (0.05, 4)
 grid_n = 300
 
 xs = np.linspace(xlim[0], xlim[1], grid_n)
@@ -61,7 +61,7 @@ fig, ax = plt.subplots(figsize=(9, 8))
 Hval = H(X, Y)
 # Choose contour levels from orbits passing through specific initial conditions
 h_levels = sorted(set(
-    H(x0, 2.0) for x0 in [0.5, 1.0, 1.5, 2.5, 3.0, 4.0, 5.0]
+    H(x0, alpha / beta) for x0 in [0.2, 0.4, 0.6, 1.0, 1.5, 2.0, 2.5, 3.0]
 ))
 ax.contour(X, Y, Hval, levels=h_levels, colors="slategray",
            linewidths=0.9, alpha=0.6)
@@ -89,9 +89,10 @@ strm = ax.streamplot(Xq, Yq, Uq, Vq, color=sq, cmap="coolwarm",
 fig.colorbar(strm.lines, ax=ax, label="speed")
 
 # Trajectory examples — integrate a few orbits to show direction
-for x0_val in [0.5, 1.5, 3.5]:
+eq_x, eq_y = gamma_ / delta, alpha / beta
+for x0_val in [0.2, 0.5, 1.2, 2.0]:
     sol = solve_ivp(lambda t, s: [f_func(s[0], s[1]), g_func(s[0], s[1])],
-                    [0, 30], [x0_val, 2.0], max_step=0.05)
+                    [0, 30], [x0_val, eq_y], max_step=0.05)
     ax.plot(sol.y[0], sol.y[1], color="gold", lw=1.8, alpha=0.8,
             zorder=3)
 
