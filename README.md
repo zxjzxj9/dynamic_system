@@ -485,9 +485,44 @@ The Lyapunov exponent λ quantifies the rate of exponential divergence of nearby
 
 The interleaving of chaotic (λ > 0) and stable (λ < 0) windows is characteristic of the **period-doubling route to chaos** and mirrors the structure seen in the bifurcation diagram above.
 
+---
+
+## Erdős-Rényi Graph — Fiedler Vector and Algebraic Connectivity
+
+The **graph Laplacian** L = D − A (degree matrix minus adjacency matrix) encodes the connectivity structure of a graph. Its second-smallest eigenvalue λ₂ — the **algebraic connectivity** or **Fiedler value** — measures how well-connected the graph is. The corresponding eigenvector v₂ — the **Fiedler vector** — reveals the graph's natural partition.
+
+```bash
+python fiedler_vector.py
+```
+
+### Graph Colored by Fiedler Vector
+
+![Fiedler Graph](fiedler_graph.png)
+
+A random Erdős-Rényi graph G(50, 0.1) with nodes colored by their Fiedler vector component v₂ᵢ (red = positive, blue = negative, size ∝ |v₂ᵢ|). The Fiedler vector assigns a real number to each node that reflects its position in the graph's connectivity structure — nodes with similar values are well-connected to each other, while nodes with opposite signs sit on different sides of the graph's natural bottleneck.
+
+### Spectral Partitioning
+
+![Fiedler Partition](fiedler_partition.png)
+
+- **Left**: the graph bisected by sign(v₂). Red nodes (v₂ᵢ > 0) and blue nodes (v₂ᵢ < 0) form two groups. Gold dashed edges are the **cut** — edges crossing the partition. This spectral bisection approximately minimizes the number of cut edges (the NP-hard min-cut problem), solved here by a single eigendecomposition.
+- **Right**: the sorted Fiedler vector components. The sign change in the middle defines the partition boundary. The magnitude of each component indicates how "strongly" each node belongs to its group — nodes near zero are on the boundary; nodes with large |v₂ᵢ| are deep inside their partition.
+
+### Laplacian Spectrum
+
+![Fiedler Spectrum](fiedler_spectrum.png)
+
+The full Laplacian eigenvalue spectrum for two ER graphs at different connection probabilities:
+
+- **Well-connected (p = 0.15)**: λ₂ = 1.73 — large spectral gap means the graph is robust; removing a few edges won't disconnect it. Information diffuses quickly across the network.
+- **Barely-connected (p = 0.05)**: λ₂ = 0.14 — tiny spectral gap means the graph is fragile, nearly disconnected. A bottleneck exists where very few edges hold the graph together.
+
+The Fiedler value has a direct physical interpretation: if we model heat diffusion on the graph (du/dt = −Lu), then λ₂ is the **slowest non-trivial decay rate** — it governs how quickly the network reaches thermal equilibrium. A small λ₂ means slow mixing; a large λ₂ means fast equilibration. This connects spectral graph theory to synchronization: on a network of coupled oscillators, λ₂ determines the critical coupling for global synchronization.
+
 ## Dependencies
 
 - sympy
 - numpy
 - matplotlib
 - scipy
+- networkx
