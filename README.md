@@ -600,6 +600,58 @@ Sweeping I reveals the full bifurcation structure:
 - **0.33 < I < 1.42**: oscillatory regime — sustained spiking with amplitude that varies with I.
 - **I ≈ 1.42**: **second Hopf bifurcation** — the limit cycle disappears and the equilibrium regains stability. This corresponds to **depolarization block** — too much current overwhelms the neuron's ability to fire.
 
+## Supply–Demand Oscillator — Speculative Dynamics and Boom-Bust Cycles
+
+$$\dot{P} = \alpha(D_0 + \mu P - P^3/3 - Q), \quad \dot{Q} = P - \gamma Q$$
+
+A Kaldor-type nonlinear market model where speculative demand creates an S-shaped excess demand function. The cubic term captures the dual nature of speculative markets: at moderate prices, trend-following (μP) dominates and demand *increases* with price; at extreme prices, mean-reversion (−P³/3) takes over.
+
+```bash
+python supply_demand.py
+```
+
+### Phase Portraits
+
+![Phase Portraits](supply_demand_phase.png)
+
+Four panels showing the transition as the price adjustment speed α increases (μ=1.0, γ=0.2, α_c = 0.2):
+
+- **α = 0.1 (stable node — attractor)**: all trajectories converge monotonically to the equilibrium. Prices adjust slowly enough that speculation cannot destabilize the market.
+- **α = 0.15 (stable spiral)**: damped oscillations — prices overshoot but eventually settle. The market corrects itself.
+- **α = 0.4 (unstable spiral + limit cycle)**: the equilibrium has become a **repeller** — trajectories spiral outward from the fixed point, but the nonlinear saturation traps them onto a stable **limit cycle**. Perpetual boom-bust oscillations emerge.
+- **α = 1.5 (strong repeller + large cycle)**: the repulsion is stronger and the limit cycle is larger — deep booms and busts with sharp, relaxation-oscillation-like transitions.
+
+### Demand & Supply Analysis
+
+![Demand Curves](supply_demand_curves.png)
+
+- **Left**: the S-shaped demand curve D(P) = μP − P³/3 vs the linear production equilibrium Q = P/γ. The cubic creates a region near the origin where demand increases with price — the speculative zone. Shading shows excess demand (price rises) vs excess supply (price falls).
+- **Right**: the demand slope D'(P) = μ − P². The red-shaded region where D'(P) > 0 (between P = ±√μ) is where speculation dominates fundamentals. The Hopf bifurcation occurs when α exceeds γ/D'(P*) — faster price adjustment amplifies the speculative feedback until the equilibrium becomes unstable.
+
+### Bifurcation Diagram
+
+![Bifurcation](supply_demand_bifurcation.png)
+
+Sweeping α reveals a clean **supercritical Hopf bifurcation**:
+
+- **α < α_c = 0.2**: the equilibrium is a stable attractor (blue). All trajectories converge — the market self-corrects.
+- **α = α_c**: Hopf bifurcation — eigenvalues cross the imaginary axis. The trace of the Jacobian tr(J) = α(μ − P*²) − γ changes sign.
+- **α > α_c**: the equilibrium becomes an unstable repeller (red), and a stable limit cycle (green envelope) emerges. The cycle amplitude grows continuously from zero — the hallmark of a supercritical bifurcation.
+
+### Time Series
+
+![Time Series](supply_demand_timeseries.png)
+
+Three regimes from top to bottom:
+
+- **α = 0.1 (attractor)**: price and quantity oscillate with decreasing amplitude, converging to equilibrium. The market damps out perturbations.
+- **α = 0.4 (limit cycle)**: sustained periodic oscillations — regular boom-bust cycles where price and quantity chase each other with a phase lag.
+- **α = 1.5 (strong repeller)**: large-amplitude relaxation oscillations — long periods of slow drift punctuated by rapid price corrections, resembling real market crashes and bubbles.
+
+**Economic interpretation**: the Hopf bifurcation captures the transition from stable markets (where price discovery works) to unstable markets (where speculative feedback creates self-reinforcing cycles). The critical parameter α represents how aggressively traders respond to perceived supply-demand imbalances — when this exceeds the market's natural damping rate γ, the equilibrium price becomes meaningless and boom-bust dynamics are inevitable.
+
+---
+
 ## Dependencies
 
 - sympy
